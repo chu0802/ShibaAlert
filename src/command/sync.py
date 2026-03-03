@@ -37,9 +37,6 @@ class SyncCommand(BaseCommand):
         if not servers:
             return "❌ No servers found in configuration."
 
-        # The command to run on each remote server
-        remote_cmd = f"cd ~/scratch/{project_name} && git pull"
-
         background_tasks = context.get("background_tasks")
         job_runner = context.get("job_runner")
         response_url = context.get("response_url")
@@ -49,6 +46,11 @@ class SyncCommand(BaseCommand):
 
         # Enqueue tasks for each server
         for srv in servers:
+            # Use the server-specific private key for GitHub authentication
+            # Assumes key is located at ~/.ssh/<server_name> on the remote host
+            git_env = f"GIT_SSH_COMMAND='ssh -i ~/.ssh/{srv} -o StrictHostKeyChecking=no'"
+            remote_cmd = f"cd ~/scratch/{project_name} && {git_env} git pull"
+            
             background_tasks.add_task(job_runner, srv, remote_cmd, response_url)
 
         return f"🔄 Initiated sync for project `{project_name}` on {len(servers)} servers: `{', '.join(servers)}`"

@@ -68,6 +68,9 @@ Host *
     ControlPersist 600
 ```
 
+### Git Sync Configuration
+For `/sync` to work, each remote server must have a private key for GitHub access located at `~/.ssh/<server_name>`. The bot will automatically use this key when running `git pull`.
+
 ## 🐳 Deployment
 
 1. **Build and Run**:
