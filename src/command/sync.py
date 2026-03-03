@@ -46,10 +46,7 @@ class SyncCommand(BaseCommand):
 
         # Enqueue tasks for each server
         for srv in servers:
-            # Use the server-specific private key for GitHub authentication
-            # Assumes key is located at ~/.ssh/<server_name> on the remote host
-            git_env = f"GIT_SSH_COMMAND='ssh -i ~/.ssh/{srv} -o StrictHostKeyChecking=no'"
-            remote_cmd = f"cd ~/scratch/{project_name} && {git_env} git pull"
+            remote_cmd = f"ssh-agent bash -c \'ssh-add ~/.ssh/{srv}; cd ~/scratch/{project_name} && git pull\'"
             
             background_tasks.add_task(job_runner, srv, remote_cmd, response_url)
 
